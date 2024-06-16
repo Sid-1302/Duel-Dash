@@ -1,6 +1,6 @@
 # Duel Dash
 
-**Duel Dash** is an interactive two-player game where players use keyboard events to control their avatars, navigating through power-ups like speed boosters and freeze spells to reach the goal first. Player 1 uses the 'W', 'A', 'S', 'D' keys, while Player 2 uses the arrow keys, creating an exciting and competitive race to claim victory. <br/>
+**Duel Dash** is an interactive two-player game where players use keyboard events to control their avatars, navigating through power-ups like speed boosters and freeze spells to reach the goal first. Player 1 uses the 'w', 'a', 's', 'd' keys, while Player 2 uses the arrow keys, creating an exciting and competitive race to claim victory. <br/>
 Play the game - [Click Here](https://sid-1302.github.io/Duel-Dash/)
 
 ## Technologies Used
