@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32x32.png">
+    <title>DUEL DASH</title>
+    <style>
+        body {
+            margin: 10px;
+            font-size: 20px;
+            height: min-content;
+            background-repeat: no-repeat;
+            background-image: url('https://cdn.gamedevmarket.net/wp-content/uploads/20191203191657/Work-2.jpg');
+        }
+
+        .players {
+            display: flex;
+            width: auto;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        #myBox,
+        #myBox2 {
+           background: linear-gradient(red,pink);
+           height: 80px;
+           width: 80px;
+           padding: 2px;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .win {
+            text-align: center;
+            font-size: 100px;
+            color: goldenrod;
+            position: relative;
+            text-shadow: 2px 2px 5px black;
+            z-index: 1;
+        }
+
+        #goal {
+            width: 50px;
+            height: 50px;
+            background-color: black;
+            padding: 10px;
+            margin: auto;
+            color: white;
+            display: flex;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            top: 400px;
+        }
+
+        #freeze,
+        #accelerate {
+            width: 60px;
+            height: 60px;
+            background-color: rgb(155, 216, 233);
+            padding: 2px;
+            color: black;
+            display: flex;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            border-radius: 60%;
+            left: -100px;
+        }
+
+        .button {
+            text-align: center;
+            font-size: 40px;
+            color: rgb(254, 183, 1);
+            position: relative;
+            padding: 5px;
+            text-shadow: 2px 2px 5px black;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="players">
+        <div id="myBox">Player 1</div>
+        <div id="myBox2">Player 2</div>
+    </div>
+    <img id="freeze" src="https://i.pinimg.com/originals/dc/40/ee/dc40eec571ff5fe4770ac2517bb93e60.gif" />
+    <img id="accelerate" src="https://media2.giphy.com/media/WDU9pnKjUTzQCE6oiP/giphy.gif" />
+    <h1></h1>
+    <div id="btn"></div>
+    <div id="goal">Goal</div>
+    <audio src="song.mp3" autoplay loop></audio>
+    <script>
+
+        const myBox = document.getElementById('myBox');
+        const myBox2 = document.getElementById('myBox2');
+        const goal = document.getElementById('goal');
+        const won = document.getElementsByTagName('h1')[0];
+        const fre = document.getElementById('freeze');
+        const acc = document.getElementById('accelerate');
+        const btn = document.getElementById('btn');
+
+        let canplay1 = true;
+        let canplay2 = true;
+        let x = 0;
+        let y = 0;
+        let moveamount = 10;
+        let x2 = 0;
+        let y2 = 0;
+        let moveamount2 = 10;
+        let winner = false;
+        let dimensions = document.getElementsByTagName('body')[0].getBoundingClientRect();
+        let min_w = 10;
+        let max_w = dimensions.width;
+        let min_h = 20;
+        let max_h = dimensions.height;
+
+        myBox.textContent = localStorage.getItem('player1');
+        myBox2.textContent = localStorage.getItem('player2');
+
+        btn.addEventListener("click", event => {
+            console.log('Button Clicked');
+            window.location.reload();
+        })
+
+
+        setInterval(() => {
+            fre.style.top = Math.floor(Math.random() * (max_h - min_h + 1)) + min_h - 20 + "px";
+            fre.style.left = Math.floor(Math.random() * (max_w - min_w + 1)) + min_w- 20 + "px";
+        }, 2500);
+
+
+        setInterval(() => {
+            acc.style.top = Math.floor(Math.random() * (max_h - min_h + 1)) + min_h -20 + "px";
+            acc.style.left = Math.floor(Math.random() * (max_w - min_w + 1)) + min_w -20+ "px";
+        }, 2000)
+
+        function checkOverlap(goal, box) {
+            const goalRect = goal.getBoundingClientRect();
+            const boxRect = box.getBoundingClientRect();
+
+            const goalRadius = goalRect.width / 2;
+            const goalCenterX = goalRect.left + goalRadius;
+            const goalCenterY = goalRect.top + goalRadius;
+
+            const boxLeft = boxRect.left;
+            const boxRight = boxRect.right;
+            const boxTop = boxRect.top;
+            const boxBottom = boxRect.bottom;
+
+            // console.log(goalCenterX, goalCenterY, goalRadius);
+            // console.log(boxLeft, boxRight, boxTop, boxBottom);
+
+            // Find the closest point on the rectangle to the circle's center
+            const closestX = Math.max(boxLeft, Math.min(goalCenterX, boxRight));
+            const closestY = Math.max(boxTop, Math.min(goalCenterY, boxBottom));
+
+            // Calculate the distance from the closest point to the circle's center
+            const distanceX = goalCenterX - closestX;
+            const distanceY = goalCenterY - closestY;
+            const distanceSquared = (distanceX * distanceX) + (distanceY * distanceY);
+
+            // Check if the distance is less than or equal to the circle's radius squared
+            return distanceSquared < (goalRadius * goalRadius);
+        }
+
+
+        function dwinner(myBox) {
+            winner = true;
+            canplay1 = false;
+            canplay2 = false;
+            won.classList.add("win");
+            won.textContent = `${myBox.textContent} Won !`
+            btn.classList.add('button');
+            btn.textContent = 'Play Again';
+            btn.style.cursor = 'grab';
+        }
+
+
+        document.addEventListener("keydown", event => {
+            if (canplay1) {
+                event.preventDefault();
+                const valid = ['a', 'w', 'd', 's'];
+                if (valid.includes(event.key)) {
+                    let k = event.key;
+                    if (k == 'w') y -= moveamount;
+                    else if (k == 's') y += moveamount;
+                    else if (k == 'd') x += moveamount;
+                    else x -= moveamount;
+                    myBox.style.top = `${y}px`;
+                    myBox.style.left = `${x}px`;
+                }
+                if (checkOverlap(freeze, myBox)) {
+                    canplay2 = false;
+                    setTimeout(() => {
+                        canplay2 = true;
+                    }, 3000);
+                }
+                if (checkOverlap(acc, myBox)) {
+                    moveamount += 5;
+                }
+                if (checkOverlap(goal, myBox) && !winner) {
+                    dwinner(myBox);
+                }
+            }
+        });
+
+
+        document.addEventListener('keydown', event => {
+            if (canplay2) {
+                event.preventDefault();
+                if (event.key.startsWith('Arrow')) {
+                    let k = event.key;
+                    if (k == 'ArrowUp') y2 -= moveamount2;
+                    else if (k == 'ArrowDown') y2 += moveamount2;
+                    else if (k == 'ArrowRight') x2 += moveamount2;
+                    else x2 -= moveamount2;
+                    myBox2.style.top = `${y2}px`;
+                    myBox2.style.left = `${x2}px`;
+                }
+                if (checkOverlap(freeze, myBox2)) {
+                    canplay1 = false;
+                    setTimeout(() => {
+                        canplay1 = true;
+                    }, 3000);
+                }
+                if (checkOverlap(acc, myBox2)) {
+                    moveamount2 += 5;
+                }
+                if (checkOverlap(goal, myBox2) && !winner) {
+                    dwinner(myBox2);
+                }
+            }
+        })
+
+    </script>
+
+</body>
+
+</html>
